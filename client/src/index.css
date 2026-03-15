@@ -1,0 +1,218 @@
+/*
+ * MCPHubz Online — Terminal Brutalism Design System
+ * Design Movement: Neo-brutalism meets terminal UI
+ * Core: Dark-first, bright green accent (#22c55e), monospace typography, split-pane layout
+ * Font: JetBrains Mono throughout — monospace as a design element
+ */
+
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-green: var(--green);
+  --color-green-dim: var(--green-dim);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+}
+
+:root {
+  --radius: 0.25rem;
+  /* Terminal Brutalism palette */
+  --background: #111111;
+  --foreground: #e2e8f0;
+  --card: #1a1a1a;
+  --card-foreground: #e2e8f0;
+  --popover: #1a1a1a;
+  --popover-foreground: #e2e8f0;
+  --primary: #22c55e;
+  --primary-foreground: #111111;
+  --secondary: #222222;
+  --secondary-foreground: #94a3b8;
+  --muted: #2a2a2a;
+  --muted-foreground: #64748b;
+  --accent: #22c55e;
+  --accent-foreground: #111111;
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: #f8fafc;
+  --border: #2a2a2a;
+  --input: #1e1e1e;
+  --ring: #22c55e;
+  /* Custom tokens */
+  --green: #22c55e;
+  --green-dim: #16a34a;
+  --surface: #1a1a1a;
+  --surface-2: #222222;
+  --green-terminal: #22c55e;
+  --amber-terminal: oklch(0.78 0.18 75);
+  --red-terminal: oklch(0.65 0.22 25);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled) {
+    @apply cursor-pointer;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #1a1a1a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #333333;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #22c55e;
+  }
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+  @media (min-width: 640px) {
+    .container { padding-left: 1.5rem; padding-right: 1.5rem; }
+  }
+  @media (min-width: 1024px) {
+    .container { padding-left: 2rem; padding-right: 2rem; max-width: 1440px; }
+  }
+
+  /* Terminal Brutalism specific utilities */
+  .green-glow {
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.3), 0 0 24px rgba(34, 197, 94, 0.1);
+  }
+  .green-text-glow {
+    text-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+  }
+  .terminal-border {
+    border: 1px solid #2a2a2a;
+  }
+  .terminal-border-green {
+    border: 1px solid rgba(34, 197, 94, 0.5);
+  }
+  .scanline {
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+  }
+  .code-block {
+    background: #0d0d0d;
+    border: 1px solid #2a2a2a;
+    border-radius: 0.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .status-dot-green {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.8);
+  }
+  /* Legacy alias — keep cyan class names working */
+  .status-dot-cyan {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.8);
+  }
+  .status-dot-amber {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: oklch(0.78 0.18 75);
+    box-shadow: 0 0 6px oklch(0.78 0.18 75 / 0.8);
+  }
+  .status-dot-red {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: oklch(0.65 0.22 25);
+    box-shadow: 0 0 6px oklch(0.65 0.22 25 / 0.8);
+  }
+  .cyan-glow { box-shadow: 0 0 12px rgba(34, 197, 94, 0.3), 0 0 24px rgba(34, 197, 94, 0.1); }
+  .cyan-text-glow { text-shadow: 0 0 8px rgba(34, 197, 94, 0.6); }
+  .terminal-border-cyan { border: 1px solid rgba(34, 197, 94, 0.5); }
+}
+
+/* Typewriter cursor animation */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.cursor-blink::after {
+  content: '_';
+  color: #22c55e;
+  animation: blink 1s step-end infinite;
+  margin-left: 2px;
+}
+
+/* Pulse animation for active indicators */
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 6px rgba(34, 197, 94, 0.8); }
+  50% { box-shadow: 0 0 12px rgba(34, 197, 94, 1), 0 0 24px rgba(34, 197, 94, 0.4); }
+}
+.pulse-green {
+  animation: pulse-green 2s ease-in-out infinite;
+}
+.pulse-cyan {
+  animation: pulse-green 2s ease-in-out infinite;
+}
+
+/* Gradient fade for hero */
+.hero-gradient {
+  background: linear-gradient(
+    135deg,
+    #111111 0%,
+    #141a14 50%,
+    #111111 100%
+  );
+}
