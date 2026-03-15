@@ -1,0 +1,41 @@
+name: Sync Templates to MCPHubz Registry
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/templates.ts'  # Only runs when templates are added or updated
+
+jobs:
+  sync:
+    name: Notify MCPHubz Registry
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Count templates
+        id: count
+        run: |
+          COUNT=$(grep -c "id:" lib/templates.ts || echo "0")
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+
+      - name: Ping MCPHubz registry sync endpoint
+        run: |
+          curl -s -X POST https://mcphubz.com/api/webmcp/sync \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.MCPHUBZ_SYNC_TOKEN }}" \
+            -d '{
+              "source": "mcphubz-online",
+              "template_count": ${{ steps.count.outputs.count }},
+              "repo": "https://github.com/timmiller99/mcphubz-online",
+              "triggered_by": "${{ github.actor }}",
+              "commit": "${{ github.sha }}"
+            }' \
+            --fail-with-body || echo "Registry sync skipped (endpoint not yet live)"
+
+      - name: Summary
+        run: |
+          echo "### Template Sync Complete" >> $GITHUB_STEP_SUMMARY
+          echo "- **Templates found:** ${{ steps.count.outputs.count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Registry:** https://mcphubz.com/webmcp-ready" >> $GITHUB_STEP_SUMMARY
