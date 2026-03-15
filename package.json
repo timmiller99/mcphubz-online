@@ -1,0 +1,39 @@
+{
+  "name": "mcphubz-online",
+  "version": "1.0.0",
+  "description": "MCPHubz Sandbox — WebMCP Template Builder",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.16.1",
+    "@codesandbox/sdk": "^1.0.0",
+    "lucide-react": "^0.396.0",
+    "next": "14.2.4",
+    "next-auth": "^4.24.13",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss-animate": "^1.0.7",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.2.4",
+    "postcss": "^8.4.39",
+    "prisma": "^5.16.1",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.5.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
