@@ -23,17 +23,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build
-        env:
-          NEXT_PUBLIC_MCPHUBZ_API: ${{ secrets.NEXT_PUBLIC_MCPHUBZ_API }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          NEXTAUTH_URL: https://mcphubz.online
+        run: pnpm run build
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
@@ -41,6 +41,6 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: mcphubz-online
-          directory: .next
+          directory: dist/public
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           wranglerVersion: '3'
