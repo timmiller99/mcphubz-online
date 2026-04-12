@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { ChevronLeft, Copy, ExternalLink, Terminal, CheckCircle2 } from "lucide-react";
+import { encodeToolToUrl } from "@/hooks/useSavedTools";
 
 const WEBMCP_ICON = "https://d2xsxph8kpxj0f.cloudfront.net/95011705/6X3ac8qz9Y8LrUNtGWhC4Z/sandbox-webmcp-icon-KUzFEUyjRezt9fUm3JDHby.webp";
 
@@ -338,8 +339,9 @@ export default function Templates() {
   };
 
   const handleOpenInSandbox = () => {
-    navigate('/sandbox/webmcp');
-    toast.info("Template loaded in sandbox");
+    const encoded = encodeToolToUrl(selected.name, "webmcp", selected.code);
+    navigate(`/sandbox?t=${encoded}`);
+    toast.success(`${selected.name} template loaded in sandbox`);
   };
 
   return (

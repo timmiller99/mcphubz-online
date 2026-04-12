@@ -414,57 +414,132 @@ export default function Sandbox() {
     addLog("info", "Starting execution...");
 
     if (mode === "mcp") {
+      // Parse the config from the code editor
       addLog("info", "Parsing MCP server configuration...");
-      await new Promise((r) => setTimeout(r, 600));
-      addLog("info", "Attempting connection to MCP server...");
-      await new Promise((r) => setTimeout(r, 800));
-      addLog("warning", "Note: Direct MCP server calls require CORS headers on the server.");
       await new Promise((r) => setTimeout(r, 400));
-      addLog("info", "Validating tool definition schema...");
-      await new Promise((r) => setTimeout(r, 500));
-      addLog("success", "Configuration parsed successfully.");
-      addLog("output", JSON.stringify({
-        status: "validated",
-        mode: "mcp-server-tester",
-        note: "To test a live server, update serverUrl and authToken in the config above.",
-        supported_servers: ["GoHighLevel MCP", "GitHub MCP", "Custom MCP Servers"],
-        next_step: "Update config and click RUN to test your server connection."
-      }, null, 2));
-    } else {
-      addLog("info", "Parsing WebMCP tool definition...");
-      await new Promise((r) => setTimeout(r, 600));
-      addLog("info", "Validating tool schema against WebMCP spec...");
-      await new Promise((r) => setTimeout(r, 700));
-      addLog("success", "Tool schema is valid.");
-      addLog("info", "Checking WebMCP availability...");
-      await new Promise((r) => setTimeout(r, 500));
-      const hasWebMCP = typeof (navigator as any).modelContext !== "undefined";
-      if (hasWebMCP) {
-        addLog("success", "WebMCP API detected in this browser.");
-        addLog("info", "Registering tool with navigator.modelContext...");
-        await new Promise((r) => setTimeout(r, 400));
-        addLog("success", "Tool registered successfully with WebMCP.");
-        addLog("output", `{"status":"registered","tool":"${toolName}","available_to":"AI agents via Chrome WebMCP"}`);
+
+      let config: Record<string, any> = {};
+      try {
+        // Extract config object values via regex — safe, no eval
+        const urlMatch = code.match(/serverUrl:\s*["'`]([^"'`]+)["'`]/);
+        const tokenMatch = code.match(/authToken:\s*["'`]([^"'`]+)["'`]/);
+        const toolMatch = code.match(/toolName:\s*["'`]([^"'`]+)["'`]/);
+        config.serverUrl = urlMatch?.[1] ?? null;
+        config.authToken = tokenMatch?.[1] ?? null;
+        config.toolName = toolMatch?.[1] ?? null;
+      } catch {
+        addLog("error", "Could not parse config. Check your syntax.");
+        setRunning(false);
+        return;
+      }
+
+      if (!config.serverUrl || config.serverUrl.includes("your-mcp-server")) {
+        addLog("warning", "No real server URL detected. Update serverUrl in the config.");
+        addLog("info", "Showing what a real request would look like...");
       } else {
-        addLog("warning", "WebMCP API not detected. Chrome 146+ with 'WebMCP for testing' flag required.");
-        addLog("info", "Running in simulation mode...");
-        await new Promise((r) => setTimeout(r, 500));
-        addLog("success", "Tool definition validated. Ready for WebMCP-enabled browser.");
-        addLog("output", JSON.stringify({
-          status: "simulated",
-          tool: toolName,
-          schema_valid: true,
-          note: "Enable chrome://flags/#enable-experimental-web-platform-features in Chrome 146+",
-          test_result: {
-            info_type: "all",
-            response: {
-              hours: "Mon-Fri 8am-6pm, Sat 9am-4pm",
-              location: "123 Main St, Your City, ST 12345",
-              services: ["Plumbing", "Electrical", "General Repairs", "Painting"],
-              contact: { phone: "(555) 123-4567", email: "info@yourbusiness.com" }
-            }
+        addLog("info", `Target: ${config.serverUrl}`);
+        addLog("warning", "MCP servers require CORS headers to accept browser requests.");
+        addLog("info", "Attempting connection (will fail without CORS — expected for most servers)...");
+        try {
+          const res = await fetch(config.serverUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(config.authToken && !config.authToken.includes("YOUR_API") ? { "Authorization": `Bearer ${config.authToken}` } : {}),
+            },
+            body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} }),
+            signal: AbortSignal.timeout(8000),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            addLog("success", `Connected! Status ${res.status}`);
+            addLog("output", JSON.stringify(data, null, 2));
+          } else {
+            addLog("error", `Server responded with status ${res.status}`);
+            addLog("info", "Check server URL and auth token.");
           }
-        }, null, 2));
+        } catch (err: any) {
+          if (err?.name === "TypeError" && err?.message?.includes("fetch")) {
+            addLog("error", "Connection blocked by CORS — this is expected for most MCP servers.");
+          } else if (err?.name === "TimeoutError") {
+            addLog("error", "Request timed out after 8s. Server may be down or URL is wrong.");
+          } else {
+            addLog("error", `Connection failed: ${err?.message ?? String(err)}`);
+          }
+          addLog("warning", "MCP servers are designed for stdio/SSE connections, not direct browser fetch.");
+        }
+      }
+
+      // Always show the equivalent curl command
+      addLog("info", "Equivalent curl command to test from your terminal:");
+      const curlAuth = config.authToken && !config.authToken.includes("YOUR_API") ? `-H "Authorization: Bearer ${config.authToken}" ` : "";
+      const curlUrl = config.serverUrl ?? "https://your-mcp-server.com/mcp";
+      addLog("output", `curl -X POST ${curlUrl} \\\n  -H "Content-Type: application/json" \\\n  ${curlAuth}\\\n  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'`);
+
+    } else {
+      // WebMCP mode — actually register the tool when API is available
+      addLog("info", "Parsing WebMCP tool definition...");
+      await new Promise((r) => setTimeout(r, 400));
+
+      // Extract tool properties from code — safe regex parsing, no eval
+      let toolDef: { name?: string; description?: string } = {};
+      try {
+        const nameMatch = code.match(/name:\s*["'`]([^"'`]+)["'`]/);
+        const descMatch = code.match(/description:\s*["'`]([^"'`]+)["'`]/);
+        toolDef.name = nameMatch?.[1];
+        toolDef.description = descMatch?.[1];
+      } catch {
+        addLog("warning", "Could not extract tool metadata from code.");
+      }
+
+      if (!toolDef.name) {
+        addLog("error", "No tool name found. Make sure your code has: name: \"tool_name\"");
+        setRunning(false);
+        return;
+      }
+
+      addLog("success", `Tool found: "${toolDef.name}"`);
+      if (toolDef.description) {
+        addLog("info", `Description: "${toolDef.description.substring(0, 80)}${toolDef.description.length > 80 ? "..." : ""}"`);
+      }
+      addLog("info", "Validating tool schema structure...");
+      await new Promise((r) => setTimeout(r, 400));
+
+      // Check for required fields
+      const hasHandler = code.includes("handler") || code.includes("async (") || code.includes("function");
+      const hasParams = code.includes("parameters") || code.includes("properties");
+      if (!hasHandler) addLog("warning", "No handler function detected. Tools need a handler to respond.");
+      if (!hasParams) addLog("info", "No parameters defined — tool will accept no inputs.");
+      addLog("success", "Schema structure valid.");
+
+      // Check for real WebMCP API
+      addLog("info", "Checking for WebMCP API (Chrome 146+ required)...");
+      await new Promise((r) => setTimeout(r, 300));
+      const hasWebMCP = typeof (navigator as any).modelContext !== "undefined";
+
+      if (hasWebMCP) {
+        addLog("success", "WebMCP API detected in this browser!");
+        addLog("info", `Registering "${toolDef.name}" with navigator.modelContext...`);
+        try {
+          (navigator as any).modelContext.registerTool(
+            toolDef.name,
+            toolDef.description ?? "",
+            { type: "object", properties: {} },
+            async () => ({ status: "ok", source: "mcphubz-sandbox", tool: toolDef.name })
+          );
+          addLog("success", `Tool "${toolDef.name}" is now registered and available to AI agents on this page.`);
+          addLog("output", JSON.stringify({ status: "registered", tool: toolDef.name, available_to: "AI agents via Chrome WebMCP" }, null, 2));
+        } catch (err: any) {
+          addLog("error", `Registration failed: ${err?.message ?? String(err)}`);
+        }
+      } else {
+        addLog("warning", "WebMCP not detected — Chrome 146+ with flag required.");
+        addLog("info", "To enable: chrome://flags → search 'WebMCP for testing' → Enable → Relaunch");
+        addLog("info", "Running schema validation only (no live registration)...");
+        await new Promise((r) => setTimeout(r, 400));
+        addLog("success", `Tool "${toolDef.name}" validated. Copy this code to your site and it will register with WebMCP.`);
+        addLog("info", "Add to your site's <script> or JS bundle:");
+        addLog("output", `navigator.modelContext.registerTool(\n  "${toolDef.name}",\n  "${(toolDef.description ?? "").substring(0, 60)}",\n  { type: "object", properties: {} },\n  async (params) => { /* your handler */ }\n);`);
       }
     }
 
