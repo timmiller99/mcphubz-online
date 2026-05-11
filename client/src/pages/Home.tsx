@@ -177,7 +177,7 @@ export default function Home() {
 
             {/* Main headline */}
             <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-4 tracking-tight text-foreground">
-              The Only Sandbox for<br />
+              The Only Sandbox to<br />
               <TypewriterText />
             </h1>
 
