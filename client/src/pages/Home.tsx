@@ -5,6 +5,7 @@
  */
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
+import { MCPHubzLogo } from "@/components/MCPHubzLogo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -131,10 +132,7 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3"
         style={{ background: '#111111f2', backdropFilter: 'blur(12px)', borderBottom: '1px solid #2a2a2a' }}>
         <div className="flex items-center gap-3">
-          <img src={WEBMCP_ICON} alt="MCPHubz" className="w-7 h-7 rounded" />
-          <span className="font-bold text-sm tracking-wider text-foreground">
-            MCPHUBZ <span className="text-primary">SANDBOX</span>
-          </span>
+          <MCPHubzLogo height={32} />
           <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/40 text-primary">
             BETA
           </Badge>
@@ -426,9 +424,9 @@ export default function Home() {
       <footer className="py-6 px-6" style={{ borderTop: '1px solid #2a2a2a' }}>
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <img src={WEBMCP_ICON} alt="MCPHubz" className="w-5 h-5 rounded" />
+            <MCPHubzLogo height={20} />
             <span className="text-xs text-muted-foreground">
-              MCPHubz Sandbox · Built on <a href="https://mcp-b.ai" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">@mcp-b</a>
+              · Built on <a href="https://mcp-b.ai" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">@mcp-b</a>
             </span>
           </div>
           <div className="flex items-center gap-4 text-[11px] text-muted-foreground">

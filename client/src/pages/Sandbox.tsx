@@ -6,6 +6,7 @@
  */
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useParams, useSearch } from "wouter";
+import { MCPHubzLogo } from "@/components/MCPHubzLogo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -627,10 +628,9 @@ export default function Sandbox() {
       <div className="flex items-center justify-between px-4 py-2.5 shrink-0"
         style={{ background: 'oklch(0.11 0.008 265)', borderBottom: '1px solid #2a2a2a' }}>
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/')} className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors text-xs">
+          <button onClick={() => navigate('/')} className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors">
             <ChevronLeft className="w-3.5 h-3.5" />
-            <img src={WEBMCP_ICON} alt="" className="w-5 h-5 rounded" />
-            <span className="font-bold tracking-wider">MCPHUBZ <span className="text-primary">SANDBOX</span></span>
+            <MCPHubzLogo height={24} />
           </button>
           <span className="text-muted-foreground/40 text-xs">/</span>
           <span className="text-xs text-muted-foreground truncate max-w-32">
