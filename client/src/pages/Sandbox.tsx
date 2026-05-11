@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 import { useSavedTools, encodeToolToUrl, decodeToolFromUrl, type SavedTool } from "@/hooks/useSavedTools";
 
-const WEBMCP_ICON = "https://d2xsxph8kpxj0f.cloudfront.net/95011705/6X3ac8qz9Y8LrUNtGWhC4Z/sandbox-webmcp-icon-KUzFEUyjRezt9fUm3JDHby.webp";
+
 
 // --- Default Code Templates ---
 const MCP_DEFAULT_CODE = `// MCP Server Connection Test

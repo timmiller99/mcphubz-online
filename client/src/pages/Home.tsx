@@ -25,7 +25,7 @@ import {
 
 const HERO_BG = "https://d2xsxph8kpxj0f.cloudfront.net/95011705/6X3ac8qz9Y8LrUNtGWhC4Z/sandbox-hero-bg-bK5Pb88nhPPBuDxAVKw5Pd.webp";
 const UI_PREVIEW = "https://d2xsxph8kpxj0f.cloudfront.net/95011705/6X3ac8qz9Y8LrUNtGWhC4Z/sandbox-ui-preview-atP7vYsZe9wGeVBBDgVMNV.webp";
-const WEBMCP_ICON = "https://d2xsxph8kpxj0f.cloudfront.net/95011705/6X3ac8qz9Y8LrUNtGWhC4Z/sandbox-webmcp-icon-KUzFEUyjRezt9fUm3JDHby.webp";
+
 
 const TYPEWRITER_TEXTS = [
   "Build MCP Servers.",
